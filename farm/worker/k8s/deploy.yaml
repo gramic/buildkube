@@ -12,4 +12,4 @@ spec:
     spec:
       containers:
       - name: worker
-        image: gcr.io/stack-build/buildkube/farm/worker:latest
+        image: eu.gcr.io/national-archives/buildkube/farm/worker:latest

@@ -4,7 +4,7 @@ metadata:
   name: worker
   namespace: farm
 spec:
-  replicas: 16
+  replicas: 4
   template:
     metadata:
       labels:

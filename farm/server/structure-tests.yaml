@@ -6,8 +6,11 @@ schemaVersion: '2.0.0'
 #
 
 metadataTest:
-  cmd: ["/buildfarm-server_deploy.jar", "/server.config"]
-  entrypoint: ["/usr/bin/java", "-jar"]
+  cmd: ["/buildfarm-server_deploy.jar",
+        "/server.config"]
+  entrypoint: ["/usr/bin/java",
+               "-Djava.util.logging.config.file=/debug.logging.properties",
+               "-jar"]
 
 fileExistenceTests:
 - name: "server config file"
@@ -22,5 +25,10 @@ fileExistenceTests:
 
 - name: "server config"
   path: "/server.config"
+  shouldExist: true
+  permissions: "-r-xr-xr-x"
+
+- name: "debug.logging.properties"
+  path: "/debug.logging.properties"
   shouldExist: true
   permissions: "-r-xr-xr-x"

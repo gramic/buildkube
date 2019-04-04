@@ -1,5 +1,6 @@
 load("@io_bazel_rules_docker//container:image.bzl", "container_image")
 load("@io_bazel_rules_docker//contrib:test.bzl", "container_test")
+load("@io_bazel_rules_docker//java:image.bzl", "java_image")
 
 container_image(
     name = "image",
@@ -8,10 +9,15 @@ container_image(
         "/buildfarm-server_deploy.jar",
         "/server.config",
     ],
+    entrypoint = [
+        "/usr/bin/java",
+        "-Djava.util.logging.config.file=/debug.logging.properties",
+        "-jar",
+    ],
     files = [
         "server.config",
         "@build_buildfarm//:server",
-
+        "debug.logging.properties",
         # Use this one in conjunction with local_repository.bzl
         #"@build_buildfarm//src/main/java/build/buildfarm:buildfarm-server_deploy.jar",
     ],

@@ -1,6 +1,7 @@
 workspace(name = "com_github_stackb_buildkube")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 #####################################################################
 # rules_go
@@ -22,43 +23,57 @@ go_register_toolchains()
 # bazel_skylib
 #####################################################################
 
-http_archive(
+git_repository(
     name = "bazel_skylib",
-    sha256 = "b5f6abe419da897b7901f90cbab08af958b97a8f3575b0d3dd062ac7ce78541f",
-    strip_prefix = "bazel-skylib-0.5.0",
-    urls = ["https://github.com/bazelbuild/bazel-skylib/archive/0.5.0.tar.gz"],
+    remote = "https://github.com/bazelbuild/bazel-skylib.git",
+    tag = "0.8.0",
 )
 
 #####################################################################
 # rules_docker
 #####################################################################
 
-RULES_DOCKER_VERSION = "c9065d170c076d540166f068aec0e04039a10e66"
-
-RULES_DOCKER_SHA256 = "e1403c24f894b49bfd64f47b74a594687567c0180eddf43d014a565b3c5552e6"
-
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = RULES_DOCKER_SHA256,
-    strip_prefix = "rules_docker-" + RULES_DOCKER_VERSION,
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/%s.tar.gz" % RULES_DOCKER_VERSION],
+    sha256 = "aed1c249d4ec8f703edddf35cbe9dfaca0b5f5ea6e4cd9e83e99f3b0d1136c3d",
+    strip_prefix = "rules_docker-0.7.0",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.7.0.tar.gz"],
 )
+
+
+load("@io_bazel_rules_docker//toolchains/docker:toolchain.bzl",
+    docker_toolchain_configure="toolchain_configure"
+)
+docker_toolchain_configure(
+  name = "docker_config",
+)
+
+load(
+    "@io_bazel_rules_docker//java:image.bzl",
+    _java_image_repos = "repositories",
+)
+
+_java_image_repos()
 
 #############################################################
 # worker execution container
 #############################################################
+load(
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
+    container_repositories = "repositories",
+)
+container_repositories()
 
 load(
     "@io_bazel_rules_docker//container:container.bzl",
     "container_pull",
-    container_repositories = "repositories",
 )
 
 RBE_UBUNTU_REGISTRY = "gcr.io"
 
 RBE_UBUNTU_REPOSITORY = "cloud-marketplace/google/rbe-ubuntu16-04"
 
-RBE_UBUNTU_DIGEST = "sha256:9bd8ba020af33edb5f11eff0af2f63b3bcb168cd6566d7b27c6685e717787928"
+RBE_UBUNTU_DIGEST = "sha256:da0f21c71abce3bbb92c3a0c44c3737f007a82b60f8bd2930abc55fe64fc2729"
 
 RBE_UBUNTU_TAG = "%s/%s@%s" % (RBE_UBUNTU_REGISTRY, RBE_UBUNTU_REPOSITORY, RBE_UBUNTU_DIGEST)
 
@@ -73,15 +88,12 @@ container_pull(
 # KUBERNETES
 #############################################################
 
-RULES_K8S_VERSION = "62ae7911ef60f91ed32fdd48a6b837287a626a80"
-
-RULES_K8S_SHA256 = "9bf9974199b3908a78638d3c7bd688bc2a69b3ddc857bd160399c58ca7fc18ea"
-
-http_archive(
+# This requires rules_docker to be fully instantiated before
+# it is pulled in.
+git_repository(
     name = "io_bazel_rules_k8s",
-    sha256 = RULES_K8S_SHA256,
-    strip_prefix = "rules_k8s-" + RULES_K8S_VERSION,
-    url = "https://github.com/bazelbuild/rules_k8s/archive/%s.zip" % RULES_K8S_VERSION,
+    commit = "8b2d62aef3f495cc7d8c14184b8ccc954dd915a8",
+    remote = "https://github.com/bazelbuild/rules_k8s.git",
 )
 
 load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
@@ -125,65 +137,6 @@ buildfarm_repository(
 # load("@build_buildfarm//3rdparty:workspace.bzl", "maven_dependencies", "declare_maven")
 # maven_dependencies(declare_maven)
 
-#####################################################################
-# BUILDGRID
-#####################################################################
-
-BUILDGRID_VERSION = "a49581a60a595fcca0ddb7beec958cf943f09cf7"
-
-load("//grid:workspace.bzl", "buildgrid_repository")
-
-buildgrid_repository(
-    name = "buildgrid_server",
-    commit = BUILDGRID_VERSION,
-)
-
-buildgrid_repository(
-    name = "buildgrid_worker",
-    commit = BUILDGRID_VERSION,
-    dockerfile = """
-FROM {base_image_tag}
-RUN python3 -m pip install --upgrade setuptools pip
-WORKDIR /app
-COPY . .
-RUN pip install --user --editable .
-    """.format(base_image_tag = RBE_UBUNTU_TAG),
-)
-
-#####################################################################
-# BUILDBARN
-#####################################################################
-
-http_archive(
-    name = "bazel_gazelle",
-    sha256 = "bc653d3e058964a5a26dcad02b6c72d7d63e6bb88d94704990b908a1445b8758",
-    urls = ["https://github.com/bazelbuild/bazel-gazelle/releases/download/0.13.0/bazel-gazelle-0.13.0.tar.gz"],
-)
-
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
-
-gazelle_dependencies()
-
-load("//barn:workspace.bzl", "buildbarn_repositories")
-
-buildbarn_repositories()
-
-BUILDBARN_VERSION = "e4c05f8003ae7a9f80876ed8fe61cf9b0e4b0784"
-
-BUILDBARN_SHA256 = "e4f4abc2fa5ddcd50c1652d21a28973113408b50f5151fcbe570d985f8bc7599"
-
-http_archive(
-    name = "buildbarn",
-    patch_cmds = [
-        # Expose the go_library targets so we can build our own binaries / images
-        "sed -i 's|//visibility:private|//visibility:public|g' cmd/bbb_frontend/BUILD.bazel",
-        "sed -i 's|//visibility:private|//visibility:public|g' cmd/bbb_scheduler/BUILD.bazel",
-        "sed -i 's|//visibility:private|//visibility:public|g' cmd/bbb_worker/BUILD.bazel",
-    ],
-    sha256 = BUILDBARN_SHA256,
-    strip_prefix = "bazel-buildbarn-" + BUILDBARN_VERSION,
-    urls = ["https://github.com/EdSchouten/bazel-buildbarn/archive/%s.tar.gz" % BUILDBARN_VERSION],
-)
 
 # local_repository(
 #     name = "buildbarn",

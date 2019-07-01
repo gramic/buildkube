@@ -2,25 +2,25 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def local_buildfarm_repository(path):
 
-    native.local_repository(
+    local_repository(
         name = "build_buildfarm",
         path = path,
     )
 
     http_archive(
         name = "googleapis",
-        sha256 = "70d7be6ad49b4424313aad118c8622aab1c5fdd5a529d4215d3884ff89264a71",
-        url = "https://github.com/googleapis/googleapis/archive/6c48ab5aef47dc14e02e2dc718d232a28067129d.tar.gz",
-        strip_prefix = "googleapis-6c48ab5aef47dc14e02e2dc718d232a28067129d",
+        sha256 = "7b6ea252f0b8fb5cd722f45feb83e115b689909bbb6a393a873b6cbad4ceae1d",
+        url = "https://github.com/googleapis/googleapis/archive/143084a2624b6591ee1f9d23e7f5241856642f4d.tar.gz",
+        strip_prefix = "googleapis-143084a2624b6591ee1f9d23e7f5241856642f4d",
         build_file = "@build_buildfarm//:BUILD.googleapis",
     )
 
     # The API that we implement.
     http_archive(
         name = "remote_apis",
-        sha256 = "00eb6f54c6206960f556e448b0d87ca48945fa6bd5b6ae4ce500fd06c02728e1",
-        url = "https://github.com/bazelbuild/remote-apis/archive/6a5a17b77bca5e70417746fd0616db3849731619.tar.gz",
-        strip_prefix = "remote-apis-6a5a17b77bca5e70417746fd0616db3849731619",
+        sha256 = "6f22ba09356f8dbecb87ba03cacf147939f77fef1c9cfaffb3826691f3686e9b",
+        url = "https://github.com/bazelbuild/remote-apis/archive/cfe8e540cbb424e3ebc649ddcbc91190f70e23a6.tar.gz",
+        strip_prefix = "remote-apis-cfe8e540cbb424e3ebc649ddcbc91190f70e23a6",
         build_file = "@build_buildfarm//:BUILD.remote_apis",
     )
 

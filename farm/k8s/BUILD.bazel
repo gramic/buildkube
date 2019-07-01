@@ -1,14 +1,63 @@
 load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_library", "jsonnet_to_json")
 
 k8s_deploy(
     name = "namespace",
     template = "namespace.yaml",
 )
 
+jsonnet_to_json(
+    name = "image-pull-secret",
+    src = "image-pull-secret.jsonnet",
+    outs = ["image-pull-secret.json"],
+)
+
+k8s_deploy(
+    name = "k8s-image-pull-secret",
+    template = ":image-pull-secret",
+)
+
+jsonnet_to_json(
+    name = "serviceaccount",
+    src = "serviceaccount.jsonnet",
+    outs = ["serviceaccount.json"],
+)
+
+k8s_deploy(
+    name = "k8s-serviceaccount",
+    template = ":serviceaccount",
+)
+
+jsonnet_to_json(
+    name = "gateway",
+    src = "gateway.jsonnet",
+    outs = ["gateway.json"],
+)
+
+k8s_deploy(
+    name = "k8s-gateway",
+    template = ":gateway",
+)
+
+jsonnet_to_json(
+    name = "virtualservice",
+    src = "virtualservice.jsonnet",
+    outs = ["virtualservice.json"],
+)
+
+k8s_deploy(
+    name = "k8s-virtualservice",
+    template = ":virtualservice",
+)
+
 k8s_objects(
     name = "k8s",
     objects = [
         ":namespace",
+        ":k8s-image-pull-secret",
+        ":k8s-serviceaccount",
+        ":k8s-gateway",
+        ":k8s-virtualservice",
     ],
 )

@@ -10,6 +10,7 @@ spec:
       labels:
         k8s-app: server
     spec:
+      serviceAccountName: my-serviceaccount
       containers:
       - name: server
         image: eu.gcr.io/national-archives/buildkube/farm/server:latest

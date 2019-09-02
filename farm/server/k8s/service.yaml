@@ -1,38 +1,38 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: operation-queue
+  name: remote
   namespace: farm
 spec:
   selector:
     k8s-app: server
   ports:
   - port: 8980
-    name: http-operation-queue
+    name: http-server
     targetPort: 8980
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: cas
-  namespace: farm
-spec:
-  selector:
-    k8s-app: server
-  ports:
-  - port: 8980
-    name: http-cas
-    targetPort: 8980
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: action-cache
-  namespace: farm
-spec:
-  selector:
-    k8s-app: server
-  ports:
-  - port: 8980
-    name: http-action-cache
-    targetPort: 8980
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: cas
+#   namespace: farm
+# spec:
+#   selector:
+#     k8s-app: server
+#   ports:
+#   - port: 8980
+#     name: http-cas
+#     targetPort: 8980
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: action-cache
+#   namespace: farm
+# spec:
+#   selector:
+#     k8s-app: server
+#   ports:
+#   - port: 8980
+#     name: http-action-cache
+#     targetPort: 8980

@@ -6,7 +6,7 @@ schemaVersion: '2.0.0'
 #
 
 metadataTest:
-  cmd: ["/buildfarm-worker_deploy.jar", "/worker.config"]
+  cmd: ["--jvm_flag=-Djava.util.logging.config.file=/debug.logging.properties", "/buildfarm-worker_deploy.jar", "/worker.config"]
   entrypoint: ["/usr/bin/java", "-jar"]
 
 fileExistenceTests:
@@ -17,5 +17,10 @@ fileExistenceTests:
 
 - name: "worker jar"
   path: "/buildfarm-worker_deploy.jar"
+  shouldExist: true
+  permissions: "-r-xr-xr-x"
+
+- name: "debug logging properties"
+  path: "/debug.logging.properties"
   shouldExist: true
   permissions: "-r-xr-xr-x"

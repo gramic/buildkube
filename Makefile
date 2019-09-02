@@ -5,7 +5,6 @@ abseil_clean:
 	(cd /tmp/abseil-cpp && bazel clean)
 
 abseil:
-	cp ./bazelrc /tmp
 	(cd /tmp/abseil-cpp && bazel \
 		--bazelrc=/tmp/bazelrc \
 		build //absl/... \

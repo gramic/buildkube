@@ -5,11 +5,13 @@ container_image(
     name = "image",
     base = "@java_image_base//image",
     cmd = [
+        # "--jvm_flag=-Djava.util.logging.config.file=/debug.logging.properties",
         "/buildfarm-server_deploy.jar",
         "/server.config",
     ],
     files = [
         "server.config",
+        "debug.logging.properties",
         "@build_buildfarm//:server",
     ],
     ports = [

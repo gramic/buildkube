@@ -10,8 +10,9 @@ spec:
       labels:
         k8s-app: server
     spec:
+      serviceAccountName: farm-serviceaccount
       containers:
       - name: server
-        image: gcr.io/stack-build/buildkube/farm/server:latest
+        image: eu.gcr.io/zp-zoneprojects/buildkube/farm/server:latest
         ports:
         - containerPort: 8980

@@ -4,14 +4,12 @@ load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 k8s_deploy(
     name = "deploy",
     images = {
-        "gcr.io/stack-build/buildkube/farm/worker:latest": "//farm/worker:image",
+        "eu.gcr.io/zp-zoneprojects/buildkube/farm/worker:latest": "//farm/worker:image",
     },
     template = "deploy.yaml",
 )
 
 k8s_objects(
     name = "k8s",
-    objects = [
-        ":deploy",
-    ],
+    objects = [":deploy"],
 )

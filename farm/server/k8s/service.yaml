@@ -8,6 +8,7 @@ spec:
     k8s-app: server
   ports:
   - port: 8980
+    name: http-operation-queue
     targetPort: 8980
 ---
 apiVersion: v1
@@ -20,6 +21,7 @@ spec:
     k8s-app: server
   ports:
   - port: 8980
+    name: http-cas
     targetPort: 8980
 ---
 apiVersion: v1
@@ -32,4 +34,5 @@ spec:
     k8s-app: server
   ports:
   - port: 8980
+    name: http-action-cache
     targetPort: 8980

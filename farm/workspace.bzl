@@ -19,7 +19,6 @@ def modify(repository_ctx, filename, directive):
     if result.return_code: 
         fail("%r failed: %s" % (args, result.stderr))
 
-
 def _buildfarm_repository_impl(repository_ctx):
     commit = repository_ctx.attr.commit
 
@@ -53,9 +52,7 @@ def _buildfarm_repository_impl(repository_ctx):
 
     repository_ctx.file("BUILD.bazel", BUILD_BAZEL)
 
-
 buildfarm_repository = repository_rule(
-    implementation = _buildfarm_repository_impl,
     attrs = {
         "remote": attr.string(
             default = "https://github.com/bazelbuild/bazel-buildfarm/archive/{commit}.tar.gz",
@@ -66,5 +63,6 @@ buildfarm_repository = repository_rule(
         "modifications": attr.string_list_dict(
             doc = "Optional sed modifications to apply",
         ),
-    }
+    },
+    implementation = _buildfarm_repository_impl,
 )

@@ -10,6 +10,7 @@ spec:
       labels:
         k8s-app: worker
     spec:
+      serviceAccountName: farm-serviceaccount
       containers:
       - name: worker
-        image: gcr.io/stack-build/buildkube/farm/worker:latest
+        image: eu.gcr.io/zp-zoneprojects/buildkube/farm/worker:latest

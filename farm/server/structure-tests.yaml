@@ -7,7 +7,7 @@ schemaVersion: '2.0.0'
 
 metadataTest:
   cmd: ["/buildfarm-server_deploy.jar", "/server.config"]
-  entrypoint: ["/usr/bin/java", "-jar"]
+  entrypoint: ["/usr/bin/java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-jar"]
 
 fileExistenceTests:
 - name: "server config file"

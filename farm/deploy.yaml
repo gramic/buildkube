@@ -16,3 +16,10 @@ spec:
         image: eu.gcr.io/zp-zoneprojects/buildkube/farm/server:latest
         ports:
         - containerPort: 8980
+      - name: worker
+        image: eu.gcr.io/zp-zoneprojects/buildkube/farm/worker:latest
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 22
+          name: tcp

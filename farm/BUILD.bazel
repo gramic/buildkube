@@ -1,0 +1,86 @@
+load("@io_bazel_rules_docker//container:image.bzl", "container_image")
+load("@io_bazel_rules_docker//contrib:test.bzl", "container_test")
+load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
+container_image(
+    name = "server_image",
+    base = "@java_image_base//image",
+    cmd = [
+        # "--jvm_flag=-Djava.util.logging.config.file=/debug.logging.properties",
+        "/buildfarm-server_deploy.jar",
+        "/server.config",
+    ],
+    files = [
+        "server.config",
+        "debug.logging.properties",
+        "@build_buildfarm//:server",
+    ],
+    ports = [
+        "8980",
+    ],
+)
+
+container_test(
+    name = "server_structure",
+    image = ":server_image",
+    configs = [
+        "server-structure-tests.yaml",
+    ],
+    size = "small",
+)
+
+container_image(
+    name = "worker_image",
+    base = "@rbe_ubuntu//image",
+    entrypoint = ["/usr/bin/java", "-jar"],
+    cmd = [
+        # "--jvm_flag=-Djava.util.logging.config.file=/debug.logging.properties",
+        "/buildfarm-worker_deploy.jar",
+        "/worker.config",
+    ],
+    files = [
+        "worker.config",
+        "debug.logging.properties",
+        "@build_buildfarm//:worker",
+    ],
+)
+
+
+container_test(
+    name = "worker_structure",
+    image = ":worker_image",
+    configs = [
+        "worker-structure-tests.yaml",
+    ],
+    size = "small",
+)
+
+k8s_deploy(
+    name = "namespace",
+    template = "namespace.yaml",
+)
+
+k8s_deploy(
+    name = "service",
+    template = "service.yaml",
+)
+
+k8s_deploy(
+    name = "deploy",
+    images = {
+        "eu.gcr.io/zp-zoneprojects/buildkube/farm/server:latest": "//farm:server_image",
+        "eu.gcr.io/zp-zoneprojects/buildkube/farm/worker:latest": "//farm:worker_image",
+    },
+    template = "deploy.yaml",
+)
+
+k8s_objects(
+    name = "k8s",
+    objects = [
+        ":namespace",
+        ":service",
+        ":deploy",
+    ],
+)
+

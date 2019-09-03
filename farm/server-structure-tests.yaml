@@ -24,3 +24,4 @@ fileExistenceTests:
   path: "/debug.logging.properties"
   shouldExist: true
   permissions: "-r-xr-xr-x"
+
